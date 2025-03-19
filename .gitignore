@@ -1,0 +1,11 @@
+.DS_Store
+*.ilk
+*.pdb
+*.o
+*.exp
+*.lib
+*.exe
+*.dylib.dSYM/
+*.dylib
+
+bin/
