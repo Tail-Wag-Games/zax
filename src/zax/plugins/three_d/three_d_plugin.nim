@@ -1,4 +1,4 @@
-import ../api, ../plugin, ecs, three_d
+import ../../api, ../../plugin, three_d
 
 var
   pluginApi {.zState.}: ptr PluginApi

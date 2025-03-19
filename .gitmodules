@@ -10,6 +10,7 @@
 [submodule "thirdparty/context"]
 	path = thirdparty/context
 	url = git@github.com:boostorg/context.git
+	ignore = dirty
 [submodule "thirdparty/sokol-nim"]
 	path = thirdparty/sokol-nim
 	url = git@github.com:Tail-Wag-Games/sokol-nim.git

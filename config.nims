@@ -52,23 +52,16 @@ when defined(windows):
 # task buildTerminalPlugin, "build terminal emulator plugin":
 #   exec "nim c --debugger:native --threads:on --app:lib --out:terminal.dll ./src/zax/plugins/terminal_plugin.nim"
 
-task buildEcsPlugin, "build ecs plugin":
-  when defined(macosx):
-    exec "nim c --debugger:native --threads:off --app:lib --passL:-lstdc++ --out:ecs.dylib ./src/zax/plugins/ecs_plugin.nim"
-  else:
-    exec "nim c --debugger:native --threads:off --app:lib --out:ecs.dylib ./src/zax/plugins/ecs_plugin.nim"
-
 task build3dPlugin, "build 3d plugin":
   when defined(macosx):
-    exec "nim c --debugger:native --threads:off --app:lib --passL:-lstdc++ --out:3d.dylib ./src/zax/plugins/three_d_plugin.nim"
+    exec "nim c --debugger:native --threads:off --app:lib --passL:-lstdc++ --out:3d.dylib ./src/zax/plugins/three_d/three_d_plugin.nim"
   else:
-    exec "nim c --debugger:native --threads:off --app:lib --out:3d.dylib ./src/zax/plugins/three_d_plugin.nim"
+    exec "nim c --debugger:native --threads:off --app:lib --out:3d.dylib ./src/zax/plugins/three_d/three_d_plugin.nim"
 
 
 task buildPlugins, "build default plugins":
   discard
   # exec "nim buildTerminalPlugin"
-  exec "nim buildEcsPlugin"
   exec "nim build3dPlugin"
 
 task make, "build zax project":

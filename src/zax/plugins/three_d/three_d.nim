@@ -1,4 +1,4 @@
-import ../api, ../zmath
+import ../../api, ../../zmath
 
 type
   ThreeDApi* = object
