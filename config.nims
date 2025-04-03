@@ -3,13 +3,14 @@ import std/[os, strutils]
 when defined(windows):
   --cc:vcc
   # --passC:"-fsanitize=address /Zi"
+elif defined(macosx):
+  --cc:clang
+  --passC:"-fsanitize=address"
+  --passL:"-fsanitize=address"
 
-# --passC:"-fsanitize=address"
-# --passL:"-fsanitize=address"
 --path:"../src"
 --path:"thirdparty"
 --path:"thirdparty/sokol-nim/src"
---path:"thirdparty/polymorph/src"
 --mm:arc
 --threads:on
 --tls_emulation:off
@@ -49,19 +50,37 @@ when defined(windows):
 #   {.hint: "Patching malloc.nim to use mimalloc".}
 #   patchFile("stdlib", "malloc", "thirdparty" / "mimalloc")
 
-# task buildTerminalPlugin, "build terminal emulator plugin":
-#   exec "nim c --debugger:native --threads:on --app:lib --out:terminal.dll ./src/zax/plugins/terminal_plugin.nim"
+task buildEcsPlugin, "build ECS plugin":
+  when defined(macosx):
+    exec "nim c --debugger:native --threads:off --app:lib --passL:-lstdc++ --out:ecs.dylib ./src/zax/plugins/ecs/ecs_plugin.nim"
+  else:
+    exec "nim c --debugger:native --threads:off --app:lib --out:ecs.dll ./src/zax/plugins/ecs/ecs_plugin.nim"
+
+task buildCameraPlugin, "build camera plugin":
+  when defined(macosx):
+    exec "nim c --debugger:native --threads:off --app:lib --passL:-lstdc++ --out:camera.dylib ./src/zax/plugins/camera/camera_plugin.nim"
+  else:
+    exec "nim c --debugger:native --threads:off --app:lib --out:camera.dll ./src/zax/plugins/camera/camera_plugin.nim"
+
+task buildTerminalPlugin, "build terminal plugin":
+  when defined(macosx):
+    exec "nim c --debugger:native --threads:off --app:lib --passL:-lstdc++ --out:terminal.dylib ./src/zax/plugins/terminal/terminal_plugin.nim"
+  else:
+    exec "nim c --debugger:native --threads:off --app:lib --out:terminal.dll ./src/zax/plugins/terminal/terminal_plugin.nim"
 
 task build3dPlugin, "build 3d plugin":
   when defined(macosx):
     exec "nim c --debugger:native --threads:off --app:lib --passL:-lstdc++ --out:3d.dylib ./src/zax/plugins/three_d/three_d_plugin.nim"
   else:
-    exec "nim c --debugger:native --threads:off --app:lib --out:3d.dylib ./src/zax/plugins/three_d/three_d_plugin.nim"
+    exec "nim c --debugger:native --threads:off --app:lib --out:3d.dll ./src/zax/plugins/three_d/three_d_plugin.nim"
 
 
 task buildPlugins, "build default plugins":
   discard
   # exec "nim buildTerminalPlugin"
+  exec "nim buildEcsPlugin"
+  exec "nim buildCameraPlugin"
+  exec "nim buildTerminalPlugin"
   exec "nim build3dPlugin"
 
 task make, "build zax project":
@@ -81,7 +100,9 @@ task make, "build zax project":
   exec "nim buildPlugins"
 
   when defined(macosx):
-    exec "nim objc --passL:-Wl,-rpath,/usr/local/lib --passL:\"-framework Cocoa -framework QuartzCore -framework Metal -framework MetalKit -lstdc++\" --out:./bin/zax.exe src/zax.nim"
+    # exec "nim objc --passL:-Wl,-rpath,/usr/local/lib --passL:\"-framework Cocoa -framework QuartzCore -framework Metal -framework MetalKit -lstdc++\" --out:./bin/zax.exe src/zax.nim"
+    exec "nim objc --passL:-Wl,-rpath,/usr/local/lib --passL:\"-lstdc++\" --out:./bin/zax.exe src/zax.nim"
+    # exec "nim objc --passL:-Wl,-rpath,/usr/local/lib --passL:\"-lstdc++\" --out:./bin/zax.exe src/zax/plugins/camera/camera_plugin.nim"
   elif defined(windows):
     exec "nim c --out:./bin/zax.exe src/zax.nim"
   else:

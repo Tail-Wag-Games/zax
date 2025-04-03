@@ -41,9 +41,12 @@ var
   pluginPath: string
   plugins: seq[PluginHandle]
   pluginUpdateOrder: seq[int]
+  updateTm: float32
 
-let nativeApis = [ cast[pointer](addr(coreApi)), cast[pointer](addr(pluginApi)), cast[pointer](addr(appApi)),
-                   cast[pointer](addr(gfxApi)), cast[pointer](addr(vfsApi)), cast[pointer](addr(assetApi)) ]
+let nativeApis = [cast[pointer](addr(coreApi)), cast[pointer](addr(pluginApi)), cast[pointer](addr(appApi)),
+                  cast[pointer](addr(gfxApi)), cast[pointer](addr(vfsApi)),
+                      cast[pointer](addr(assetApi))
+  ]
 
 when defined(host):
   {.link: "../../thirdparty/cr.o".}
@@ -156,11 +159,16 @@ when defined(host):
       if not dirExists(pluginPath):
         echo "plugin path: ", pluginPath, " is incorrect"
 
-  proc update*() =
+  proc update*(dt: float32) =
     block:
       for i in 0 ..< pluginUpdateOrder.len():
         let handle = plugins[pluginUpdateOrder[i]].addr
-        assert updatePlugin(handle.data.plugin.addr, true) >= 0
+        var checkReload = false
+        updateTm += dt
+        if updateTm >= 1.0'f32:
+          checkReload = true
+          updateTm = 0
+        let updateRes = updatePlugin(handle.data.plugin.addr, checkReload)
 
   proc shutdown*() =
     echo "shutting down plugins"

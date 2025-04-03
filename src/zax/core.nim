@@ -1,5 +1,5 @@
 import std/cpuinfo,
-       sokol/gfx as sg, sokol/glue as sglue,
+       sokol/gfx as sg, sokol/glue as sglue, sokol/time as stm,
        api, asset, cfg, gfx, jobs, plugin, zapis
 
 type
@@ -15,11 +15,7 @@ type
 
     numThreads: int32
 
-var
-  ctx: CoreContext
-  passAction = PassAction(
-    colors: [ ColorAttachmentAction( loadAction: loadActionClear, clearValue: (1, 0, 0, 0)) ]
-  )
+var ctx: CoreContext
 
 proc deltaTick(): uint64 {.cdecl.} =
   result = ctx.deltaTick
@@ -49,6 +45,8 @@ proc jobThreadIndex(): int32 {.cdecl.} =
   result = jobThreadIndex(ctx.jobCtx)
 
 proc init*(cfg: var Config) =
+  stm.setup()
+
   var numWorkerThreads = if cfg.numJobThreads >=
       0: cfg.numJobThreads else: int32(countProcessors() - 1)
   numWorkerThreads = max(1, numWorkerThreads)
@@ -69,12 +67,12 @@ proc init*(cfg: var Config) =
   plugin.init(cfg.pluginPath)
 
 proc frame*() =
-  # ctx.deltaTick = laptime(addr(ctx.lastTick))
+  ctx.deltaTick = laptime(addr(ctx.lastTick))
   ctx.elapsedTick += ctx.deltaTick
 
   let
     deltaTick = ctx.deltaTick
-    # dt = float32(sec(deltaTick))
+    dt = float32(sec(deltaTick))
 
   if deltaTick > 0:
     # var
@@ -89,7 +87,7 @@ proc frame*() =
   # vfs.update()
 
   # asset.update()
-  plugin.update()
+  plugin.update(dt)
 
   gfx.executeCommandBuffers()
 

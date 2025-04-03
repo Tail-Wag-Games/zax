@@ -2,4 +2,4 @@
 #define CR_EVENT_FUNC "zPluginEventHandler"
 #define CR_HOST CR_UNSAFE
 #define CR_DEBUG
-#include "cr/cr.h"
+#include "cr/cr/cr.h"

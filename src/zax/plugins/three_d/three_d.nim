@@ -1,5 +1,3 @@
-import ../../api, ../../zmath
-
 type
   ThreeDApi* = object
 

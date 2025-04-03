@@ -1,9 +1,10 @@
-import zax/[api, cfg],
-       zax/plugins/[ecs]
+import zax/[api, cfg]
+import zax/plugins/builtin
 
 export api,
        cfg,
-       ecs
+       builtin
+
 
 when isMainModule:
   import std/[dynlib, os, parseopt, strformat],

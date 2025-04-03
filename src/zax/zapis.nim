@@ -7,4 +7,3 @@ var
   gfxApi*: GfxApi
   pluginApi*: PluginApi
   vfsApi*: VfsApi
-  cameraApi*: CameraApi

@@ -1,7 +1,9 @@
 import std/macros,
-       sokol/gfx as sg,
+       flecs, sokol/gfx as sg,
        mstreams, sync, zmath
 
+export
+  flecs.World
 
 type
   ApiKind* = distinct uint8
@@ -68,6 +70,11 @@ type
     numJobThreads*: proc(): int32 {.cdecl.}
     jobThreadIndex*: proc(): int32 {.cdecl.}
 
+  # EcsApi* = object
+  #   new*: proc(): Entity {.cdecl.}
+  #   delete*: proc(e: Entity) {.cdecl.}
+  #   isAlive*: proc(e: Entity): bool {.cdecl.}
+
   GfxStage* = object
     id*: uint32
 
@@ -121,8 +128,10 @@ type
     beginDefaultPass*: proc(passAction: ptr PassAction; width,
         height: int32) {.cdecl.}
     beginPass*: proc(pass: Pass) {.cdecl.}
-    applyViewport*: proc(x, y, width, height: int32; originTopLeft: bool) {.cdecl.}
-    applyScissorRect*: proc(x, y, width, height: int32; originTopLeft: bool) {.cdecl.}
+    applyViewport*: proc(x, y, width, height: int32;
+        originTopLeft: bool) {.cdecl.}
+    applyScissorRect*: proc(x, y, width, height: int32;
+        originTopLeft: bool) {.cdecl.}
     applyPipeline*: proc(pip: Pipeline) {.cdecl.}
     applyBindings*: proc(bindings: ptr Bindings) {.cdecl.}
     applyUniforms*: proc(stage: sg.ShaderStage; ubIndex: int32; data: pointer;
@@ -165,9 +174,9 @@ type
     getTexture*: proc(textureAssetHandle: AssetHandle): ptr api.Texture {.cdecl.}
     swapchain*: proc(): sg.Swapchain {.cdecl.}
 
-  PluginEvent* = distinct uint32
-  PluginFailure* = distinct uint32
-  PluginOperation* = distinct uint32
+  PluginEvent* = distinct int32
+  PluginFailure* = distinct int32
+  PluginOperation* = distinct int32
 
   Plugin* = object
     p*: pointer
@@ -196,8 +205,6 @@ type
     readAsync*: proc(path: cstring; flags: VfsFlag;
         readFn: VfsAsyncReadCallback; userData: pointer) {.cdecl.}
 
-  CameraApi* = object
-
 const
   # API Kinds
   akCore* = ApiKind(0)
@@ -206,8 +213,7 @@ const
   akGfx* = ApiKind(3)
   akVfs* = ApiKind(4)
   akAsset* = ApiKind(5)
-  akCamera* = ApiKind(6)
-  akCount* = ApiKind(7)
+  akCount* = ApiKind(6)
 
   # Asset Load Flags
   alfNone* = AssetLoadFlag(0)
@@ -267,38 +273,89 @@ when defined(vcc):
       )
     )
 elif defined(macosx):
+  proc parseBracketExpr(n: NimNode): NimNode =
+    if n.kind == nnkBracketExpr:
+      result = nnkBracketExpr.newTree()
+      for c in n.children:
+        add(result, parseBracketExpr(c))
+    else:
+      result = newIdentNode(n.strVal)
+
+  proc parsePragmaExpr(n: NimNode): NimNode =
+    if n.kind == nnkPragmaExpr:
+      result = nnkPragmaExpr.newTree()
+      for c in n.children:
+        if c.kind == nnkPragma:
+          add(result, c)
+    else:
+      result = newIdentNode(n.strVal)
+
   macro zState*(t: typed): untyped =
+    echo treeRepr t
     let typeNode = if t[0][1].kind == nnkSym:
         newIdentNode(t[0][1].strVal)
       elif t[0][1].kind == nnkPtrTy:
         nnkPtrTy.newTree(newIdentNode(t[0][1][0].strVal))
       elif t[0][1].kind == nnkRefTy:
         nnkRefTy.newTree(newIdentNode(t[0][1][0].strVal))
+      elif t[0][1].kind == nnkBracketExpr:
+        var newTree = nnkBracketExpr.newTree()
+        for c in t[0][1].children:
+          add(newTree, parseBracketExpr(c))
+        newTree
+      elif t[0][1].kind == nnkCommand:
+        var newTree = nnkCommand.newTree()
+        for c in t[0][1].children:
+          add(newTree, newIdentNode(c.strVal))
+        newTree
+      elif t[0][1].kind == nnkPragmaExpr:
+        var newTree = nnkPragmaExpr.newTree()
+        for c in t[0][1].children:
+          add(newTree, parsePragmaExpr(c))
+        newTree
       else:
         newIdentNode("")
 
-    result = nnkStmtList.newTree(
-      nnkVarSection.newTree(
-        nnkIdentDefs.newTree(
-          nnkPragmaExpr.newTree(
-            newIdentNode(t[0][0].strVal),
-            nnkPragma.newTree(
-              nnkExprColonExpr.newTree(
-                newIdentNode("codegenDecl"),
-                newLit("__attribute__((used, section(\"__DATA,__state\"))) $# $#")
+    if t[0][0].kind == nnkSym:
+      result = nnkStmtList.newTree(
+        nnkVarSection.newTree(
+          nnkIdentDefs.newTree(
+            nnkPragmaExpr.newTree(
+              newIdentNode(t[0][0].strVal),
+              nnkPragma.newTree(
+                nnkExprColonExpr.newTree(
+                  newIdentNode("codegenDecl"),
+                  newLit("__attribute__((used, section(\"__DATA,__state\"))) $# $#")
         )
       )
         ),
         typeNode,
         newEmptyNode()
       )
+        )
       )
-    )
-
-
+    elif t[0][0].kind == nnkPragmaExpr:
+      result = nnkStmtList.newTree(
+        nnkVarSection.newTree(
+          nnkIdentDefs.newTree(
+            nnkPragmaExpr.newTree(
+              newIdentNode(t[0][0][0].strVal),
+              nnkPragma.newTree(
+                nnkExprColonExpr.newTree(
+                  newIdentNode("codegenDecl"),
+                  newLit("__attribute__((used, section(\"__DATA,__state\"))) $# $#")
+        ),
+        t[0][0][1][0]
+      )
+        ),
+        typeNode,
+        newEmptyNode()
+      )
+        )
+      )
 
 proc `<`*(a, b: ApiKind): bool {.borrow.}
-template`[]`*[N, T](a: array[N, T]; b: ApiKind): T = a[ord(b)]
+template `[]`*[N, T](a: array[N, T]; b: ApiKind): T = a[ord(b)]
 
 proc `and`*(a, b: AssetLoadFlag): AssetLoadFlag {.borrow.}
 proc `or`*(a, b: AssetLoadFlag): AssetLoadFlag {.borrow.}
