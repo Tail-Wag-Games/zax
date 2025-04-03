@@ -3392,8 +3392,7 @@ macro join(prefix, infix, suffix: untyped): untyped =
 
 template metaComponent*(world, name: untyped): untyped =
   defineComponent(world, name)
-  ecs_meta_from_desc(world, id(name), join("FLECS_", name,
-      "_kind"), join("FLECS_", name, "_desc"))
+  ecs_meta_from_desc(world, id(name), `name Kind`, `name Desc`)
 
 macro struct*(name, body: untyped): untyped =
   let
@@ -3447,7 +3446,7 @@ macro struct*(name, body: untyped): untyped =
   ),
       nnkIdentDefs.newTree(
         nnkPragmaExpr.newTree(
-          newIdentNode("FLECS_" & $name & "_desc"),
+          newIdentNode($name & "Desc"),
           nnkPragma.newTree(
             newIdentNode("zState"),
             nnkExprColonExpr.newTree(
@@ -3457,11 +3456,11 @@ macro struct*(name, body: untyped): untyped =
   )
     ),
     newIdentNode("cstring"),
-    newLit("{int foo;}")
+    newLit(desc)
   ),
       nnkIdentDefs.newTree(
         nnkPragmaExpr.newTree(
-          newIdentNode("FLECS_" & $name & "_kind"),
+          newIdentNode($name & "Kind"),
           nnkPragma.newTree(
             newIdentNode("zState"),
             nnkExprColonExpr.newTree(

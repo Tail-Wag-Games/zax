@@ -11,11 +11,11 @@ when defined(i386) or defined(amd64):
   # Documentation at https://software.intel.com/sites/landingpage/IntrinsicsGuide/
 
   when defined(vcc):
-    {.pragma: x86_type, byCopy, header:"<intrin.h>".}
-    {.pragma: x86, noDecl, header:"<intrin.h>".}
+    {.pragma: x86_type, byCopy, header: "<intrin.h>".}
+    {.pragma: x86, noDecl, header: "<intrin.h>".}
   else:
-    {.pragma: x86_type, byCopy, header:"<x86intrin.h>".}
-    {.pragma: x86, noDecl, header:"<x86intrin.h>".}
+    {.pragma: x86_type, byCopy, header: "<x86intrin.h>".}
+    {.pragma: x86, noDecl, header: "<x86intrin.h>".}
   type
     m128* {.importc: "__m128", x86_type.} = object
       raw: array[4, float32]
@@ -127,22 +127,22 @@ when defined(i386) or defined(amd64):
       ano_handmademath_pp_96*: INNER_C_UNION_handmademath_pp_91
       a*: float32
 
-    INNER_C_STRUCT_handmademath_pp_103* {.bycopy.} = object
+    INNER_C_STRUCT_handmademath_pp_103 * {.bycopy.} = object
       xy*: Vec2
       ignored0*: float32
       ignored1*: float32
 
-    INNER_C_STRUCT_handmademath_pp_110* {.bycopy.} = object
+    INNER_C_STRUCT_handmademath_pp_110 * {.bycopy.} = object
       ignored2*: float32
       yz*: Vec2
       ignored3*: float32
 
-    INNER_C_STRUCT_handmademath_pp_117* {.bycopy.} = object
+    INNER_C_STRUCT_handmademath_pp_117 * {.bycopy.} = object
       ignored4*: float32
       ignored5*: float32
       zw*: Vec2
 
-    INNER_C_STRUCT_handmademath_pp_147* {.bycopy.} = object
+    INNER_C_STRUCT_handmademath_pp_147 * {.bycopy.} = object
       x*: float32
       y*: float32
       z*: float32
@@ -151,7 +151,7 @@ when defined(i386) or defined(amd64):
       xyz*: Vec3
       ano_handmademath_pp_148*: INNER_C_STRUCT_handmademath_pp_147
 
-    INNER_C_STRUCT_handmademath_pp_142* {.bycopy.} = object
+    INNER_C_STRUCT_handmademath_pp_142 * {.bycopy.} = object
       ano_handmademath_pp_149*: INNER_C_UNION_handmademath_pp_144
       w*: float32
 
@@ -224,7 +224,8 @@ when defined(i386) or defined(amd64):
   proc `<`*(a, b: Vec2): bool =
     result = a.x < b.x and a.y < b.y
 
-  proc `~=`*(p1: Vec2, p2: Vec2): bool = abs(p1.x - p2.x) <= epsilon(float32) and abs(p1.y - p2.y) <= epsilon(float32)
+  proc `~=`*(p1: Vec2; p2: Vec2): bool = abs(p1.x - p2.x) <= epsilon(
+      float32) and abs(p1.y - p2.y) <= epsilon(float32)
 
   proc cmpX*(p1, p2: Vec2): int =
     if p1.x != p2.x:
@@ -469,20 +470,26 @@ when defined(i386) or defined(amd64):
 
   proc vec4v*(v: Vec3; w: float32): Vec4 {.inline.} =
     var res: Vec4
-    res.internalElementsSSE = mm_setr_ps(v.ano_handmademath_pp_32.x, v.ano_handmademath_pp_32.y, v.ano_handmademath_pp_32.z, w)
+    res.internalElementsSSE = mm_setr_ps(v.ano_handmademath_pp_32.x,
+        v.ano_handmademath_pp_32.y, v.ano_handmademath_pp_32.z, w)
     return res
 
   proc addVec2*(l: Vec2; r: Vec2): Vec2 {.inline.} =
     var res: Vec2
-    res.ano_handmademath_pp_6.x = l.ano_handmademath_pp_6.x + r.ano_handmademath_pp_6.x
-    res.ano_handmademath_pp_6.y = l.ano_handmademath_pp_6.y + r.ano_handmademath_pp_6.y
+    res.ano_handmademath_pp_6.x = l.ano_handmademath_pp_6.x +
+        r.ano_handmademath_pp_6.x
+    res.ano_handmademath_pp_6.y = l.ano_handmademath_pp_6.y +
+        r.ano_handmademath_pp_6.y
     return res
 
   proc addVec3*(l: Vec3; r: Vec3): Vec3 {.inline.} =
     var res: Vec3
-    res.ano_handmademath_pp_32.x = l.ano_handmademath_pp_32.x + r.ano_handmademath_pp_32.x
-    res.ano_handmademath_pp_32.y = l.ano_handmademath_pp_32.y + r.ano_handmademath_pp_32.y
-    res.ano_handmademath_pp_32.z = l.ano_handmademath_pp_32.z + r.ano_handmademath_pp_32.z
+    res.ano_handmademath_pp_32.x = l.ano_handmademath_pp_32.x +
+        r.ano_handmademath_pp_32.x
+    res.ano_handmademath_pp_32.y = l.ano_handmademath_pp_32.y +
+        r.ano_handmademath_pp_32.y
+    res.ano_handmademath_pp_32.z = l.ano_handmademath_pp_32.z +
+        r.ano_handmademath_pp_32.z
     return res
 
   proc addVec4*(l: Vec4; r: Vec4): Vec4 {.inline.} =
@@ -493,15 +500,20 @@ when defined(i386) or defined(amd64):
 
   proc subtractVec2*(l: Vec2; r: Vec2): Vec2 {.inline.} =
     var res: Vec2
-    res.ano_handmademath_pp_6.x = l.ano_handmademath_pp_6.x - r.ano_handmademath_pp_6.x
-    res.ano_handmademath_pp_6.y = l.ano_handmademath_pp_6.y - r.ano_handmademath_pp_6.y
+    res.ano_handmademath_pp_6.x = l.ano_handmademath_pp_6.x -
+        r.ano_handmademath_pp_6.x
+    res.ano_handmademath_pp_6.y = l.ano_handmademath_pp_6.y -
+        r.ano_handmademath_pp_6.y
     return res
 
   proc subtractVec3*(l: Vec3; r: Vec3): Vec3 {.inline.} =
     var res: Vec3
-    res.ano_handmademath_pp_32.x = l.ano_handmademath_pp_32.x - r.ano_handmademath_pp_32.x
-    res.ano_handmademath_pp_32.y = l.ano_handmademath_pp_32.y - r.ano_handmademath_pp_32.y
-    res.ano_handmademath_pp_32.z = l.ano_handmademath_pp_32.z - r.ano_handmademath_pp_32.z
+    res.ano_handmademath_pp_32.x = l.ano_handmademath_pp_32.x -
+        r.ano_handmademath_pp_32.x
+    res.ano_handmademath_pp_32.y = l.ano_handmademath_pp_32.y -
+        r.ano_handmademath_pp_32.y
+    res.ano_handmademath_pp_32.z = l.ano_handmademath_pp_32.z -
+        r.ano_handmademath_pp_32.z
     return res
 
   proc subtractVec4*(l: Vec4; r: Vec4): Vec4 {.inline.} =
@@ -512,8 +524,10 @@ when defined(i386) or defined(amd64):
 
   proc multiplyVec2*(l: Vec2; r: Vec2): Vec2 {.inline.} =
     var res: Vec2
-    res.ano_handmademath_pp_6.x = l.ano_handmademath_pp_6.x * r.ano_handmademath_pp_6.x
-    res.ano_handmademath_pp_6.y = l.ano_handmademath_pp_6.y * r.ano_handmademath_pp_6.y
+    res.ano_handmademath_pp_6.x = l.ano_handmademath_pp_6.x *
+        r.ano_handmademath_pp_6.x
+    res.ano_handmademath_pp_6.y = l.ano_handmademath_pp_6.y *
+        r.ano_handmademath_pp_6.y
     return res
 
   proc multiplyVec2f*(l: Vec2; r: float32): Vec2 {.inline.} =
@@ -739,87 +753,87 @@ when defined(i386) or defined(amd64):
       det: float32
       inv: Mat4
 
-    inv.raw[0] = m.raw[5]  * m.raw[10] * m.raw[15] -
-      m.raw[5]  * m.raw[11] * m.raw[14] -
-      m.raw[9]  * m.raw[6]  * m.raw[15] +
-      m.raw[9]  * m.raw[7]  * m.raw[14] +
-      m.raw[13] * m.raw[6]  * m.raw[11] -
-      m.raw[13] * m.raw[7]  * m.raw[10]
+    inv.raw[0] = m.raw[5] * m.raw[10] * m.raw[15] -
+      m.raw[5] * m.raw[11] * m.raw[14] -
+      m.raw[9] * m.raw[6] * m.raw[15] +
+      m.raw[9] * m.raw[7] * m.raw[14] +
+      m.raw[13] * m.raw[6] * m.raw[11] -
+      m.raw[13] * m.raw[7] * m.raw[10]
 
-    inv.raw[4] = -m.raw[4]  * m.raw[10] * m.raw[15] +
-      m.raw[4]  * m.raw[11] * m.raw[14] +
-      m.raw[8]  * m.raw[6]  * m.raw[15] -
-      m.raw[8]  * m.raw[7]  * m.raw[14] -
-      m.raw[12] * m.raw[6]  * m.raw[11] +
-      m.raw[12] * m.raw[7]  * m.raw[10]
+    inv.raw[4] = -m.raw[4] * m.raw[10] * m.raw[15] +
+      m.raw[4] * m.raw[11] * m.raw[14] +
+      m.raw[8] * m.raw[6] * m.raw[15] -
+      m.raw[8] * m.raw[7] * m.raw[14] -
+      m.raw[12] * m.raw[6] * m.raw[11] +
+      m.raw[12] * m.raw[7] * m.raw[10]
 
-    inv.raw[8] = m.raw[4]  * m.raw[9] * m.raw[15] -
-      m.raw[4]  * m.raw[11] * m.raw[13] -
-      m.raw[8]  * m.raw[5] * m.raw[15] +
-      m.raw[8]  * m.raw[7] * m.raw[13] +
+    inv.raw[8] = m.raw[4] * m.raw[9] * m.raw[15] -
+      m.raw[4] * m.raw[11] * m.raw[13] -
+      m.raw[8] * m.raw[5] * m.raw[15] +
+      m.raw[8] * m.raw[7] * m.raw[13] +
       m.raw[12] * m.raw[5] * m.raw[11] -
       m.raw[12] * m.raw[7] * m.raw[9]
 
-    inv.raw[12] = -m.raw[4]  * m.raw[9] * m.raw[14] +
-      m.raw[4]  * m.raw[10] * m.raw[13] +
-      m.raw[8]  * m.raw[5] * m.raw[14] -
-      m.raw[8]  * m.raw[6] * m.raw[13] -
+    inv.raw[12] = -m.raw[4] * m.raw[9] * m.raw[14] +
+      m.raw[4] * m.raw[10] * m.raw[13] +
+      m.raw[8] * m.raw[5] * m.raw[14] -
+      m.raw[8] * m.raw[6] * m.raw[13] -
       m.raw[12] * m.raw[5] * m.raw[10] +
       m.raw[12] * m.raw[6] * m.raw[9]
 
-    inv.raw[1] = -m.raw[1]  * m.raw[10] * m.raw[15] +
-      m.raw[1]  * m.raw[11] * m.raw[14] +
-      m.raw[9]  * m.raw[2] * m.raw[15] -
-      m.raw[9]  * m.raw[3] * m.raw[14] -
+    inv.raw[1] = -m.raw[1] * m.raw[10] * m.raw[15] +
+      m.raw[1] * m.raw[11] * m.raw[14] +
+      m.raw[9] * m.raw[2] * m.raw[15] -
+      m.raw[9] * m.raw[3] * m.raw[14] -
       m.raw[13] * m.raw[2] * m.raw[11] +
       m.raw[13] * m.raw[3] * m.raw[10]
 
-    inv.raw[5] = m.raw[0]  * m.raw[10] * m.raw[15] -
-      m.raw[0]  * m.raw[11] * m.raw[14] -
-      m.raw[8]  * m.raw[2] * m.raw[15] +
-      m.raw[8]  * m.raw[3] * m.raw[14] +
+    inv.raw[5] = m.raw[0] * m.raw[10] * m.raw[15] -
+      m.raw[0] * m.raw[11] * m.raw[14] -
+      m.raw[8] * m.raw[2] * m.raw[15] +
+      m.raw[8] * m.raw[3] * m.raw[14] +
       m.raw[12] * m.raw[2] * m.raw[11] -
       m.raw[12] * m.raw[3] * m.raw[10]
 
-    inv.raw[9] = -m.raw[0]  * m.raw[9] * m.raw[15] +
-      m.raw[0]  * m.raw[11] * m.raw[13] +
-      m.raw[8]  * m.raw[1] * m.raw[15] -
-      m.raw[8]  * m.raw[3] * m.raw[13] -
+    inv.raw[9] = -m.raw[0] * m.raw[9] * m.raw[15] +
+      m.raw[0] * m.raw[11] * m.raw[13] +
+      m.raw[8] * m.raw[1] * m.raw[15] -
+      m.raw[8] * m.raw[3] * m.raw[13] -
       m.raw[12] * m.raw[1] * m.raw[11] +
       m.raw[12] * m.raw[3] * m.raw[9]
 
-    inv.raw[13] = m.raw[0]  * m.raw[9] * m.raw[14] -
-      m.raw[0]  * m.raw[10] * m.raw[13] -
-      m.raw[8]  * m.raw[1] * m.raw[14] +
-      m.raw[8]  * m.raw[2] * m.raw[13] +
+    inv.raw[13] = m.raw[0] * m.raw[9] * m.raw[14] -
+      m.raw[0] * m.raw[10] * m.raw[13] -
+      m.raw[8] * m.raw[1] * m.raw[14] +
+      m.raw[8] * m.raw[2] * m.raw[13] +
       m.raw[12] * m.raw[1] * m.raw[10] -
       m.raw[12] * m.raw[2] * m.raw[9]
 
-    inv.raw[2] = m.raw[1]  * m.raw[6] * m.raw[15] -
-      m.raw[1]  * m.raw[7] * m.raw[14] -
-      m.raw[5]  * m.raw[2] * m.raw[15] +
-      m.raw[5]  * m.raw[3] * m.raw[14] +
+    inv.raw[2] = m.raw[1] * m.raw[6] * m.raw[15] -
+      m.raw[1] * m.raw[7] * m.raw[14] -
+      m.raw[5] * m.raw[2] * m.raw[15] +
+      m.raw[5] * m.raw[3] * m.raw[14] +
       m.raw[13] * m.raw[2] * m.raw[7] -
       m.raw[13] * m.raw[3] * m.raw[6]
 
-    inv.raw[6] = -m.raw[0]  * m.raw[6] * m.raw[15] +
-      m.raw[0]  * m.raw[7] * m.raw[14] +
-      m.raw[4]  * m.raw[2] * m.raw[15] -
-      m.raw[4]  * m.raw[3] * m.raw[14] -
+    inv.raw[6] = -m.raw[0] * m.raw[6] * m.raw[15] +
+      m.raw[0] * m.raw[7] * m.raw[14] +
+      m.raw[4] * m.raw[2] * m.raw[15] -
+      m.raw[4] * m.raw[3] * m.raw[14] -
       m.raw[12] * m.raw[2] * m.raw[7] +
       m.raw[12] * m.raw[3] * m.raw[6]
 
-    inv.raw[10] = m.raw[0]  * m.raw[5] * m.raw[15] -
-      m.raw[0]  * m.raw[7] * m.raw[13] -
-      m.raw[4]  * m.raw[1] * m.raw[15] +
-      m.raw[4]  * m.raw[3] * m.raw[13] +
+    inv.raw[10] = m.raw[0] * m.raw[5] * m.raw[15] -
+      m.raw[0] * m.raw[7] * m.raw[13] -
+      m.raw[4] * m.raw[1] * m.raw[15] +
+      m.raw[4] * m.raw[3] * m.raw[13] +
       m.raw[12] * m.raw[1] * m.raw[7] -
       m.raw[12] * m.raw[3] * m.raw[5]
 
-    inv.raw[14] = -m.raw[0]  * m.raw[5] * m.raw[14] +
-      m.raw[0]  * m.raw[6] * m.raw[13] +
-      m.raw[4]  * m.raw[1] * m.raw[14] -
-      m.raw[4]  * m.raw[2] * m.raw[13] -
+    inv.raw[14] = -m.raw[0] * m.raw[5] * m.raw[14] +
+      m.raw[0] * m.raw[6] * m.raw[13] +
+      m.raw[4] * m.raw[1] * m.raw[14] -
+      m.raw[4] * m.raw[2] * m.raw[13] -
       m.raw[12] * m.raw[1] * m.raw[6] +
       m.raw[12] * m.raw[2] * m.raw[5]
 
@@ -917,7 +931,8 @@ when defined(i386) or defined(amd64):
     res.elements[3][2] = (Far + Near) / (Near - Far)
     return res
 
-  proc perspective*(FOV: float32; AspectRatio: float32; Near: float32; Far: float32): Mat4 {.
+  proc perspective*(FOV: float32; AspectRatio: float32; Near: float32;
+      Far: float32): Mat4 {.
       inline.} =
     var res: Mat4 = mat4()
     var Cotangent: float32 = 1.0 / tanF(FOV * (3.14159265359 / 360.0))
@@ -990,7 +1005,8 @@ when defined(i386) or defined(amd64):
     result.elements[3][2] = dotVec3(f, eye)
     result.elements[3][3] = 1.0'f32
 
-  proc quaternion*(x: float32; y: float32; z: float32; w: float32): Quaternion {.inline.} =
+  proc quaternion*(x: float32; y: float32; z: float32;
+      w: float32): Quaternion {.inline.} =
     var res: Quaternion
     res.internalElementsSSE = mm_setr_ps(x, y, z, w)
     return res
@@ -1052,7 +1068,8 @@ when defined(i386) or defined(amd64):
                                           mm_mul_ps(SSEResultTwo, SSEResultOne))
     return res
 
-  proc multiplyQuaternionF*(l: Quaternion; Multiplicative: float32): Quaternion {.
+  proc multiplyQuaternionF*(l: Quaternion;
+      Multiplicative: float32): Quaternion {.
       inline.} =
     var res: Quaternion
     var Scalar: m128 = mm_set_ps1(Multiplicative)
@@ -1097,7 +1114,8 @@ when defined(i386) or defined(amd64):
     res = normalizeQuaternion(res)
     return res
 
-  proc slerp*(l: Quaternion; Time: float32; r: Quaternion): Quaternion {.importc: "HMM_Slerp".}
+  proc slerp*(l: Quaternion; Time: float32;
+      r: Quaternion): Quaternion {.importc: "HMM_Slerp".}
 
   proc quaternionToMat4*(l: Quaternion): Mat4 {.inline.} =
     let normalizedQuat = normalizeQuaternion(l)
@@ -1135,7 +1153,7 @@ when defined(i386) or defined(amd64):
     result.elements[3][2] = 0.0'f32
     result.elements[3][3] = 1.0'f32
 
-  proc mat4ToQuaternion*(m: Mat4): Quaternion {.inline} =
+  proc mat4ToQuaternion*(m: Mat4): Quaternion {.inline.} =
     var t: float32
 
     if m.elements[2][2] < 0.0'f32:
@@ -1175,7 +1193,8 @@ when defined(i386) or defined(amd64):
 
     result = multiplyQuaternionF(result, 0.5'f32 / squareRootF(t))
 
-  proc quaternionFromAxisAngle*(axis: Vec3; angleOfRotation: float32): Quaternion {.inline.} =
+  proc quaternionFromAxisAngle*(axis: Vec3;
+      angleOfRotation: float32): Quaternion {.inline.} =
     let
       normalizedAxis = normalizeVec3(axis)
       sinRot = sinF(angleOfRotation / 2.0'f32)
@@ -1184,11 +1203,11 @@ when defined(i386) or defined(amd64):
 
 else:
   when defined(clang):
-    {.pragma: arm64_type, byCopy, header:"<arm_neon.h>".}
-    {.pragma: arm64, noDecl, header:"<arm_neon.h>".}
+    {.pragma: arm64_type, byCopy, header: "<arm_neon.h>".}
+    {.pragma: arm64, noDecl, header: "<arm_neon.h>".}
 
   type
-    float32x4_t*{.importc: "__attribute__((neon_vector_type(4))) float32_t", byCopy.} = object
+    float32x4_t* {.importc, arm64_type.} = object
 
     INNER_C_STRUCT_HandmadeMath_8* {.bycopy.} = object
       x*: cfloat
@@ -1352,7 +1371,8 @@ else:
   proc `<`*(a, b: Vec2): bool =
     result = a.x < b.x and a.y < b.y
 
-  proc `~=`*(p1: Vec2, p2: Vec2): bool = abs(p1.x - p2.x) <= epsilon(float32) and abs(p1.y - p2.y) <= epsilon(float32)
+  proc `~=`*(p1: Vec2; p2: Vec2): bool = abs(p1.x - p2.x) <= epsilon(
+      float32) and abs(p1.y - p2.y) <= epsilon(float32)
 
   # Vec3
 
@@ -1675,16 +1695,20 @@ else:
   proc HMM_InvOrthographic*(OrthoMatrix: HMM_Mat4): HMM_Mat4 =
     discard
 
-  proc HMM_Perspective_RH_NO*(FOV: cfloat; AspectRatio: cfloat; Near: cfloat; Far: cfloat): HMM_Mat4 =
+  proc HMM_Perspective_RH_NO*(FOV: cfloat; AspectRatio: cfloat; Near: cfloat;
+      Far: cfloat): HMM_Mat4 =
     discard
 
-  proc HMM_Perspective_RH_ZO*(FOV: cfloat; AspectRatio: cfloat; Near: cfloat; Far: cfloat): HMM_Mat4 =
+  proc HMM_Perspective_RH_ZO*(FOV: cfloat; AspectRatio: cfloat; Near: cfloat;
+      Far: cfloat): HMM_Mat4 =
     discard
 
-  proc HMM_Perspective_LH_NO*(FOV: cfloat; AspectRatio: cfloat; Near: cfloat; Far: cfloat): HMM_Mat4 =
+  proc HMM_Perspective_LH_NO*(FOV: cfloat; AspectRatio: cfloat; Near: cfloat;
+      Far: cfloat): HMM_Mat4 =
     discard
 
-  proc HMM_Perspective_LH_ZO*(FOV: cfloat; AspectRatio: cfloat; Near: cfloat; Far: cfloat): HMM_Mat4 =
+  proc HMM_Perspective_LH_ZO*(FOV: cfloat; AspectRatio: cfloat; Near: cfloat;
+      Far: cfloat): HMM_Mat4 =
     discard
 
   proc HMM_InvPerspective_RH*(PerspectiveMatrix: HMM_Mat4): HMM_Mat4 =
@@ -1756,7 +1780,8 @@ else:
   proc HMM_NormQ*(Quat: HMM_Quat): HMM_Quat =
     discard
 
-  proc HMM_MixQImpl*(Left: HMM_Quat; MixLeft: cfloat; Right: HMM_Quat; MixRight: cfloat): HMM_Quat =
+  proc HMM_MixQImpl*(Left: HMM_Quat; MixLeft: cfloat; Right: HMM_Quat;
+      MixRight: cfloat): HMM_Quat =
     discard
 
   proc HMM_NLerp*(Left: HMM_Quat; Time: cfloat; Right: HMM_Quat): HMM_Quat =

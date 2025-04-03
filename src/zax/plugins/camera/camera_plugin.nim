@@ -1,18 +1,9 @@
-import flecs, sokol_app as sapp,
+import hmm, flecs, sokol_app as sapp,
        ../../api, ../../plugin, camera
-# var
-#   FLECS_IDOrbitCameraComponentID {.zState, nodecl,
-#       exportc: "FLECS_IDOrbitCameraComponentID_".}: Entity
-#   FLECS_OrbitCameraComponent_desc {.zState,
-#                                     exportc: "FLECS__OrbitCameraComponent_desc".}: cstring = "{int foo;}"
-#   FLECS_OrbitCameraComponent_kind {.zState,
-#                                     exportc: "FLECS__OrbitCameraComponent_kind".}: ecs_type_kind_t = EcsStructType
 
-# type
-#   OrbitCameraComponent* = object
-#     foo*: int
-struct(OrbitCameraComponent):
-  foo: int
+struct(CameraComponent):
+  position: Vec3
+  target: Vec3
 
 var
   pluginApi {.zState.}: ptr PluginApi
@@ -20,16 +11,16 @@ var
 
 proc init(w: ptr World) {.cdecl.} =
   ecs_os_init()
-  metaComponent(w, OrbitCameraComponent)
-  echo "is valid: ", ecs_is_valid(w, FLECS_IDOrbitCameraComponentID)
-  echo "name: ", ecs_get_name(w, FLECS_IDOrbitCameraComponentID)
-  echo "symbol: ", ecs_get_symbol(w, FLECS_IDOrbitCameraComponentID)
-  echo "init: ", FLECS_IDOrbitCameraComponentID
-  # e1 = ecs_new(w)
-  # set(w, e1, FLECS_IDOrbitCameraComponentID, OrbitCameraComponent,
-  #     OrbitCameraComponent(foo: 1))
-  # let occ = get(w, e1, OrbitCameraComponent)
-  # echo repr occ
+  echo metaComponent(w, CameraComponent)
+  echo "is valid: ", ecs_is_valid(w, FLECS_IDCameraComponentID)
+  echo "name: ", ecs_get_name(w, FLECS_IDCameraComponentID)
+  echo "symbol: ", ecs_get_symbol(w, FLECS_IDCameraComponentID)
+  echo "init: ", FLECS_IDCameraComponentID
+  e1 = ecs_new(w)
+  set(w, e1, FLECS_IDCameraComponentID, CameraComponent,
+      CameraComponent(position: vec3(5, 5, 5), target: vec3(0, 0, 0)))
+  let occ = get(w, e1, CameraComponent)
+  echo repr occ
 
 proc update(w: ptr World) {.cdecl.} =
   # let occ = get(w, e1, OrbitCameraComponent)
